@@ -6,7 +6,13 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <section>
+    
+    <nav class="tabs-nav">
+        <button class="tab-button active" data-tab="search">🔍 Recherche</button>
+        <button class="tab-button" data-tab="history">📜 Historique</button>
+    </nav>
+
+    <section class="tab-content active" id="search-tab">
         <div class="search_div">
             <img src="../../assets/wikibrowser_banner.png" alt="WikBrowser Logo" class="logo">
             <form class="search_bar js-search-form">
@@ -14,8 +20,17 @@
                 <button class="search_button">🔍</button>
             </form>
         </div>
+        <section class="search_results js-search-results"></section>
     </section>
-    <section class="search_results js-search-results"></section>
+
+    <section class="tab-content" id="history-tab">
+        <div class="history-container">
+            <h2>Historique des recherches</h2>
+            <button class="clear-history-btn">🗑️ Effacer l'historique</button>
+            <div class="history-list js-history-list"></div>
+        </div>
+    </section>
+
     <script src="script.js"></script>   
 </body>
 </html>
