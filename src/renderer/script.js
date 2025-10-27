@@ -1,3 +1,63 @@
+// Gestion de l'historique
+function saveToHistory(searchTerm, results) {
+    const history = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+    const timestamp = new Date().toLocaleString('fr-FR');
+    
+    history.unshift({
+        term: searchTerm,
+        timestamp: timestamp,
+        resultsCount: results.length
+    });
+
+    if (history.length > 50) {
+        history.pop();
+    }
+    
+    localStorage.setItem('searchHistory', JSON.stringify(history));
+}
+
+function loadHistory() {
+    const history = JSON.parse(localStorage.getItem('searchHistory') || '[]');
+    const historyList = document.querySelector('.js-history-list');
+    
+    if (history.length === 0) {
+        historyList.innerHTML = '<p class="no-history">Aucun historique pour le moment</p>';
+        return;
+    }
+    
+    historyList.innerHTML = history.map(entry => `
+        <div class="history-item">
+            <div class="history-term">
+                <strong>🔍 ${entry.term}</strong>
+                <span class="history-count">${entry.resultsCount} résultat(s)</span>
+            </div>
+            <div class="history-date">📅 ${entry.timestamp}</div>
+        </div>
+    `).join('');
+}
+
+function clearHistory() {
+    if (confirm('Êtes-vous sûr de vouloir effacer tout l\'historique ?')) {
+        localStorage.removeItem('searchHistory');
+        loadHistory();
+    }
+}
+
+function switchTab(tabName) {
+   
+    document.querySelectorAll('.tab-button').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+    
+
+    document.querySelector(`[data-tab="${tabName}"]`).classList.add('active');
+    document.getElementById(`${tabName}-tab`).classList.add('active');
+    
+
+    if (tabName === 'history') {
+        loadHistory();
+    }
+}
+
 function handleSubmit(event) {
     event.preventDefault();
     const inputField = document.querySelector('.js-search-input').value.trim();
@@ -16,6 +76,8 @@ function handleSubmit(event) {
                 alert('Aucun résultat trouvé')
                 return;
             }
+
+            saveToHistory(inputField, results);
 
             results.forEach(result => {
                 const url = `https://fr.wikipedia.org/?curid=${result.pageid}`;
@@ -36,4 +98,11 @@ function handleSubmit(event) {
     });
 }
 
+// Event listeners
 document.querySelector('.js-search-form').addEventListener('submit', handleSubmit);
+
+document.querySelectorAll('.tab-button').forEach(button => {
+    button.addEventListener('click', () => switchTab(button.dataset.tab));
+});
+
+document.querySelector('.clear-history-btn').addEventListener('click', clearHistory);
